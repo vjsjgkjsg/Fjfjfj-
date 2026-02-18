@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 Интерактивные игры — Образовательный проект</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* === СПЕЦИАЛЬНЫЕ СТИЛИ ДЛЯ ИГР === */
+    
+    .games-hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      padding: 80px 24px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .games-hero::before {
+      content: '🎮🎯🧩🎲🎪';
+      position: absolute;
+      font-size: 8rem;
+      opacity: 0.1;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      letter-spacing: 2rem;
+      animation: rotate 20s linear infinite;
+    }
+    @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+    .games-hero h1 { font-size: 3.5rem; margin-bottom: 20px; text-shadow: 0 4px 20px rgba(0,0,0,.3); position: relative; z-index: 1; }
+    .games-hero p { font-size: 1.3rem; opacity: .95; position: relative; z-index: 1; }
+
+    .game-section { margin-bottom: 80px; }
+    .game-container {
+      background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+      border-radius: 32px;
+      box-shadow: 0 20px 60px rgba(102,126,234,.2);
+      overflow: hidden;
+      border: 3px solid #667eea;
+    }
+    .game-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .game-title { display: flex; align-items: center; gap: 16px; }
+    .game-icon { font-size: 3rem; }
+    .game-title h2 { font-size: 2rem; margin: 0; }
+    .game-badge {
+      background: rgba(255,255,255,.2);
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: .9rem;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+    }
+    .game-body { padding: 40px; }
+    .game-description {
+      font-size: 1.1rem;
+      color: #4a5568;
+      line-height: 1.8;
+      margin-bottom: 32px;
+      padding: 20px;
+      background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+      border-radius: 16px;
+      border-left: 5px solid #667eea;
+    }
+
+    /* === ИГРА 1: ВИКТОРИНА === */
+    .quiz-progress {
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,.1);
+    }
+    .quiz-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+      border-radius: 20px;
+      transition: width .5s ease;
+      box-shadow: 0 0 20px rgba(102,126,234,.5);
+    }
+    .quiz-score {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #667eea;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .quiz-question {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #2d3748;
+      margin-bottom: 28px;
+      padding: 24px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .quiz-opt {
+      padding: 20px;
+      border: 3px solid #e2e8f0;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all .3s ease;
+      background: white;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+    .quiz-opt::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102,126,234,.1), transparent);
+      transition: left .5s ease;
+    }
+    .quiz-opt:hover {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(102,126,234,.2);
+    }
+    .quiz-opt:hover::before { left: 100%; }
+    .quiz-opt.correct {
+      border-color: #48bb78;
+      background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+      color: #22543d;
+      animation: bounce .5s ease;
+    }
+    .quiz-opt.wrong {
+      border-color: #f56565;
+      background: linear-gradient(135deg, #fed7d7, #fc8181);
+      color: #742a2a;
+      animation: shake .5s ease;
+    }
+    @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+    .quiz-result {
+      padding: 20px;
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+      animation: fadeIn .5s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .game-btn {
+      padding: 16px 40px;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all .3s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(102,126,234,.3);
+    }
+    .game-btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    .game-btn-primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(102,126,234,.4);
+    }
+
+    /* === ИГРА 2: ПАМЯТЬ === */
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+    .memory-card {
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      transition: all .3s ease;
+      transform-style: preserve-3d;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    }
+    .memory-card:hover { transform: scale(1.05); }
+    .memory-card.flipped {
+      background: white;
+      border: 3px solid #667eea;
+    }
+    .memory-card.matched {
+      background: linear-gradient(135deg, #48bb78, #38a169);
+      animation: pulse .5s ease;
+    }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    .memory-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+    .memory-stat {
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      text-align: center;
+    }
+    .memory-stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #667eea;
+    }
+    .memory-stat-label {
+      font-size: .9rem;
+      color: #718096;
+      font-weight: 600;
+    }
+
+    /* === ИГРА 3: УГАДАЙ СЛОВО === */
+    .word-display {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: 1rem;
+      color: #667eea;
+      margin: 32px 0;
+      text-align: center;
+      font-family: monospace;
+    }
+    .word-keyboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+      gap: 10px;
+      max-width: 700px;
+      margin: 0 auto 32px;
+    }
+    .word-key {
+      padding: 16px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      text-transform: uppercase;
+    }
+    .word-key:hover {
+      background: #667eea;
+      color: white;
+      transform: scale(1.1);
+    }
+    .word-key.used {
+      background: #cbd5e0;
+      color: #a0aec0;
+      cursor: not-allowed;
+    }
+    .word-key.used:hover { transform: none; }
+    .word-hint {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      padding: 20px;
+      border-radius: 16px;
+      border-left: 5px solid #f59e0b;
+      margin-bottom: 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #78350f;
+    }
+    .word-lives {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 2rem;
+    }
+
+    /* === ИГРА 4: ПАЗЛ === */
+    .puzzle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 400px;
+      margin: 0 auto 32px;
+    }
+    .puzzle-tile {
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 800;
+      color: white;
+      cursor: pointer;
+      transition: all .3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    }
+    .puzzle-tile:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0,0,0,.3);
+    }
+    .puzzle-tile.empty {
+      background: #e2e8f0;
+      cursor: default;
+    }
+    .puzzle-moves {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 24px;
+    }
+
+    /* === ИГРА 5: НАЙДИ ПАРУ === */
+    .pairs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+    .pair-card {
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      transition: all .3s ease;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+      transform-style: preserve-3d;
+    }
+    .pair-card:hover { transform: scale(1.05); }
+    .pair-card.flipped {
+      background: white;
+      border: 3px solid #f093fb;
+    }
+    .pair-card.matched {
+      background: linear-gradient(135deg, #48bb78, #38a169);
+      animation: rotate3d .6s ease;
+    }
+    @keyframes rotate3d {
+      0% { transform: rotateY(0deg); }
+      50% { transform: rotateY(180deg); }
+      100% { transform: rotateY(360deg); }
+    }
+
+    /* === АДАПТИВ === */
+    @media (max-width: 768px) {
+      .games-hero h1 { font-size: 2.5rem; }
+      .quiz-options { grid-template-columns: 1fr; }
+      .memory-grid { grid-template-columns: repeat(3, 1fr); }
+      .puzzle-grid { max-width: 300px; }
+      .pairs-grid { grid-template-columns: repeat(3, 1fr); }
+      .word-keyboard { grid-template-columns: repeat(7, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <div class="header-top">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">
+          <h1>Университет Козыбаева</h1>
+          <p>Образовательный проект · г. Петропавловск</p>
+        </div>
+      </a>
+      <div class="lang-switch">
+        <button class="lang-btn active" data-lang="ru">RU</button>
+        <button class="lang-btn" data-lang="kz">KZ</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="container">
+      <ul class="nav-list">
+        <li><a href="index.html" class="nav-link"><span class="nav-icon">🏠</span><span>Главная</span></a></li>
+        <li><a href="sights.html" class="nav-link"><span class="nav-icon">🏙️</span><span>Достопримечательности</span></a></li>
+        <li><a href="methodical.html" class="nav-link"><span class="nav-icon">📚</span><span>Методическая копилка</span></a></li>
+        <li><a href="talks.html" class="nav-link"><span class="nav-icon">💬</span><span>Полезные беседы</span></a></li>
+        <li><a href="games.html" class="nav-link active"><span class="nav-icon">🎮</span><span>Игры</span></a></li>
+        <li><a href="presentations.html" class="nav-link"><span class="nav-icon">📊</span><span>Презентации</span></a></li>
+        <li><a href="contacts.html" class="nav-link"><span class="nav-icon">📍</span><span>Контакты</span></a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<section class="games-hero">
+  <h1>🎮 Интерактивные игры</h1>
+  <p>Играй и учись! 5 крутых игр про Петропавловск и Казахстан</p>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <!-- ИГРА 1: ВИКТОРИНА -->
+    <div class="game-section">
+      <div class="game-container">
+        <div class="game-header">
+          <div class="game-title">
+            <div class="game-icon">🧠</div>
+            <h2>Викторина «Знаток Петропавловска»</h2>
+          </div>
+          <div class="game-badge">Игра 1 / 5</div>
+        </div>
+        <div class="game-body">
+          <div class="game-description">
+            📚 Проверь свои знания о родном городе! 10 вопросов от простых к сложным. Сможешь набрать максимум баллов?
+          </div>
+          
+          <div class="quiz-progress"><div class="quiz-bar" id="quizBar1" style="width:0"></div></div>
+          <div class="quiz-score" id="quizScore1">Вопрос 1 из 10 · Очки: 0</div>
+          <div class="quiz-question" id="quizQ1">Нажми «Начать игру» чтобы стартовать! 🚀</div>
+          <div class="quiz-options" id="quizOpts1" style="display:none"></div>
+          <div class="quiz-result" id="quizResult1" style="display:none"></div>
+          <div style="text-align:center">
+            <button class="game-btn game-btn-primary" id="quizStart1" onclick="startQuiz1()">🎮 Начать викторину</button>
+            <button class="game-btn game-btn-primary" id="quizNext1" onclick="nextQ1()" style="display:none">Следующий вопрос →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ИГРА 2: ПАМЯТЬ -->
+    <div class="game-section">
+      <div class="game-container">
+        <div class="game-header">
+          <div class="game-title">
+            <div class="game-icon">🃏</div>
+            <h2>Игра «Память» — Символы Казахстана</h2>
+          </div>
+          <div class="game-badge">Игра 2 / 5</div>
+        </div>
+        <div class="game-body">
+          <div class="game-description">
+            🎯 Найди все пары карточек с символами Казахстана! Тренируй память и внимание.
+          </div>
+          
+          <div class="memory-stats">
+            <div class="memory-stat">
+              <div class="memory-stat-num" id="memoryMoves">0</div>
+              <div class="memory-stat-label">Ходов</div>
+            </div>
+            <div class="memory-stat">
+              <div class="memory-stat-num" id="memoryPairs">0/8</div>
+              <div class="memory-stat-label">Пар найдено</div>
+            </div>
+            <div class="memory-stat">
+              <div class="memory-stat-num" id="memoryTime">0:00</div>
+              <div class="memory-stat-label">Время</div>
+            </div>
+          </div>
+          
+          <div class="memory-grid" id="memoryGrid"></div>
+          <div style="text-align:center">
+            <button class="game-btn game-btn-primary" onclick="startMemory()">🔄 Начать / Перезапуск</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ИГРА 3: УГАДАЙ СЛОВО -->
+    <div class="game-section">
+      <div class="game-container">
+        <div class="game-header">
+          <div class="game-title">
+            <div class="game-icon">📝</div>
+            <h2>Игра «Угадай слово» — Достопримечательности</h2>
+          </div>
+          <div class="game-badge">Игра 3 / 5</div>
+        </div>
+        <div class="game-body">
+          <div class="game-description">
+            🏛️ Угадай название достопримечательности Петропавловска по подсказке! У тебя 6 попыток.
+          </div>
+          
+          <div class="word-hint" id="wordHint">Нажми «Начать игру» чтобы получить подсказку!</div>
+          <div class="word-lives" id="wordLives">❤️❤️❤️❤️❤️❤️</div>
+          <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
+          <div class="word-keyboard" id="wordKeyboard"></div>
+          <div style="text-align:center">
+            <button class="game-btn game-btn-primary" onclick="startWord()">🎮 Начать / Новое слово</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ИГРА 4: ПАЗЛ 8 -->
+    <div class="game-section">
+      <div class="game-container">
+        <div class="game-header">
+          <div class="game-title">
+            <div class="game-icon">🧩</div>
+            <h2>Пятнашки — Собери числа</h2>
+          </div>
+          <div class="game-badge">Игра 4 / 5</div>
+        </div>
+        <div class="game-body">
+          <div class="game-description">
+            🎲 Классическая головоломка! Расставь числа от 1 до 8 по порядку.
+          </div>
+          
+          <div class="puzzle-moves" id="puzzleMoves">Ходов: 0</div>
+          <div class="puzzle-grid" id="puzzleGrid"></div>
+          <div style="text-align:center">
+            <button class="game-btn game-btn-primary" onclick="startPuzzle()">🔄 Перемешать заново</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ИГРА 5: НАЙДИ ПАРУ -->
+    <div class="game-section">
+      <div class="game-container">
+        <div class="game-header">
+          <div class="game-title">
+            <div class="game-icon">🎨</div>
+            <h2>Найди пару — Культура Казахстана</h2>
+          </div>
+          <div class="game-badge">Игра 5 / 5</div>
+        </div>
+        <div class="game-body">
+          <div class="game-description">
+            🎭 Найди одинаковые предметы казахской культуры! 16 карточек, 8 пар.
+          </div>
+          
+          <div class="memory-stats">
+            <div class="memory-stat">
+              <div class="memory-stat-num" id="pairsMoves">0</div>
+              <div class="memory-stat-label">Ходов</div>
+            </div>
+            <div class="memory-stat">
+              <div class="memory-stat-num" id="pairsPairs">0/8</div>
+              <div class="memory-stat-label">Пар найдено</div>
+            </div>
+          </div>
+          
+          <div class="pairs-grid" id="pairsGrid"></div>
+          <div style="text-align:center">
+            <button class="game-btn game-btn-primary" onclick="startPairs()">🔄 Начать / Перезапуск</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <div class="footer-emblem">🎓</div>
+          <div>
+            <div class="footer-name">Университет Козыбаева</div>
+            <div class="footer-tagline">Образовательный проект</div>
+          </div>
+        </div>
+        <p>Дипломный образовательный проект для дошкольников Петропавловска, 2025.</p>
+      </div>
+      <div>
+        <h4>Разделы</h4>
+        <ul>
+          <li><a href="index.html">🏠 Главная</a></li>
+          <li><a href="sights.html">🏙️ Достопримечательности</a></li>
+          <li><a href="methodical.html">📚 Методическая копилка</a></li>
+          <li><a href="games.html">🎮 Игры</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Для кого</h4>
+        <ul>
+          <li><a href="methodical.html">👩‍🏫 Воспитателям</a></li>
+          <li><a href="methodical.html">👨‍👩‍👧 Родителям</a></li>
+          <li><a href="games.html">🧒 Детям</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Контакты</h4>
+        <div class="footer-contact"><span class="footer-contact-icon">📍</span><span>г. Петропавловск</span></div>
+        <div class="footer-contact"><span class="footer-contact-icon">📧</span><span>info@nkzu.kz</span></div>
+        <div class="footer-contact"><span class="footer-contact-icon">📞</span><span>+7 (7152) 46-14-14</span></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Университет имени М. Козыбаева. Все права защищены.</p>
+      <p>Дипломный проект · г. Петропавловск</p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+// === ИГРА 1: ВИКТОРИНА ===
+const quiz1 = [
+  {q:"🏙️ В каком году был основан Петропавловск?",opts:["1752","1800","1900","1850"],ans:0},
+  {q:"🌊 Какая река протекает через наш город?",opts:["Иртыш","Ишим","Урал","Тобол"],ans:1},
+  {q:"🇰🇿 Петропавловск — столица какой области?",opts:["Акмолинской","Северо-Казахстанской","Карагандинской","Костанайской"],ans:1},
+  {q:"🎭 Как называется главный театр города?",opts:["Театр им. Абая","Театр им. Погодина","Театр им. Чехова","Русский театр"],ans:1},
+  {q:"❄️ Какая самая низкая температура бывает зимой?",opts:["-20°C","-30°C","-40°C","-50°C"],ans:2},
+  {q:"🏛️ В честь кого назван наш город?",opts:["Петра I","Святых Петра и Павла","Петра Великого","Павла I"],ans:1},
+  {q:"🌲 Как называется городской бор?",opts:["Сосновый бор","Зелёная роща","Берёзовая роща","Городской парк"],ans:1},
+  {q:"📚 Как называется главная библиотека?",opts:["Библиотека им. Пушкина","Библиотека им. Муканова","Областная библиотека","Центральная библиотека"],ans:1},
+  {q:"🏰 Когда была построена Петропавловская крепость?",opts:["1750 год","1752 год","1755 год","1760 год"],ans:1},
+  {q:"🎨 Сколько примерно жителей в Петропавловске?",opts:["100 тысяч","200 тысяч","300 тысяч","400 тысяч"],ans:1}
+];
+let q1Idx=0,score1=0,answered1=false;
+
+function startQuiz1() {
+  q1Idx=0; score1=0; answered1=false;
+  document.getElementById('quizStart1').style.display='none';
+  document.getElementById('quizOpts1').style.display='grid';
+  renderQ1();
+}
+function renderQ1() {
+  if (q1Idx >= quiz1.length) {
+    document.getElementById('quizQ1').textContent = '🎉 Викторина завершена!';
+    document.getElementById('quizOpts1').style.display = 'none';
+    document.getElementById('quizNext1').style.display = 'none';
+    const res = document.getElementById('quizResult1');
+    res.style.display = 'block';
+    res.style.background = 'linear-gradient(135deg, #c6f6d5, #9ae6b4)';
+    res.style.color = '#22543d';
+    res.textContent = `Твой результат: ${score1} из ${quiz1.length}! ${score1>=8?'🌟 Отлично! Ты настоящий знаток!':score1>=5?'👍 Хорошо! Но можно лучше!':'💪 Попробуй ещё раз!'}`;
+    document.getElementById('quizScore1').textContent = `Финал: ${score1}/${quiz1.length}`;
+    document.getElementById('quizBar1').style.width = '100%';
+    document.getElementById('quizStart1').style.display = 'inline-flex';
+    document.getElementById('quizStart1').textContent = '🔄 Играть снова';
+    return;
+  }
+  const q = quiz1[q1Idx];
+  document.getElementById('quizQ1').textContent = q.q;
+  document.getElementById('quizScore1').textContent = `Вопрос ${q1Idx+1} из ${quiz1.length} · Очки: ${score1}`;
+  document.getElementById('quizBar1').style.width = (q1Idx/quiz1.length*100)+'%';
+  document.getElementById('quizResult1').style.display = 'none';
+  document.getElementById('quizNext1').style.display = 'none';
+  answered1 = false;
+  const opts = document.getElementById('quizOpts1');
+  opts.innerHTML = '';
+  q.opts.forEach((o,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = o;
+    btn.onclick = () => answerQ1(i);
+    opts.appendChild(btn);
+  });
+}
+function answerQ1(i) {
+  if (answered1) return;
+  answered1 = true;
+  const q = quiz1[q1Idx];
+  document.querySelectorAll('#quizOpts1 .quiz-opt').forEach((b,idx) => {
+    if (idx === q.ans) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  const res = document.getElementById('quizResult1');
+  if (i === q.ans) {
+    score1++;
+    res.textContent = '✅ Правильно! Отличный ответ!';
+    res.style.background = 'linear-gradient(135deg, #c6f6d5, #9ae6b4)';
+    res.style.color = '#22543d';
+  } else {
+    res.textContent = `❌ Неверно. Правильный ответ: ${q.opts[q.ans]}`;
+    res.style.background = 'linear-gradient(135deg, #fed7d7, #fc8181)';
+    res.style.color = '#742a2a';
+  }
+  res.style.display = 'block';
+  document.getElementById('quizNext1').style.display = 'inline-flex';
+  document.getElementById('quizScore1').textContent = `Вопрос ${q1Idx+1} из ${quiz1.length} · Очки: ${score1}`;
+}
+function nextQ1() { q1Idx++; renderQ1(); }
+
+// === ИГРА 2: ПАМЯТЬ ===
+const memoryEmojis = ['🇰🇿','🏔️','🐎','🎭','🏛️','🌾','🎪','🎨'];
+let memoryCards = [];
+let memoryFlipped = [];
+let memoryMatched = 0;
+let memoryMoves = 0;
+let memoryTimer = null;
+let memorySeconds = 0;
+
+function startMemory() {
+  memoryCards = [...memoryEmojis, ...memoryEmojis].sort(() => Math.random() - 0.5);
+  memoryFlipped = [];
+  memoryMatched = 0;
+  memoryMoves = 0;
+  memorySeconds = 0;
+  document.getElementById('memoryMoves').textContent = '0';
+  document.getElementById('memoryPairs').textContent = '0/8';
+  document.getElementById('memoryTime').textContent = '0:00';
+  if (memoryTimer) clearInterval(memoryTimer);
+  memoryTimer = setInterval(() => {
+    memorySeconds++;
+    const m = Math.floor(memorySeconds/60);
+    const s = memorySeconds%60;
+    document.getElementById('memoryTime').textContent = `${m}:${s<10?'0':''}${s}`;
+  }, 1000);
+  
+  const grid = document.getElementById('memoryGrid');
+  grid.innerHTML = '';
+  memoryCards.forEach((emoji, idx) => {
+    const card = document.createElement('div');
+    card.className = 'memory-card';
+    card.dataset.idx = idx;
+    card.textContent = '❓';
+    card.onclick = () => flipMemory(idx);
+    grid.appendChild(card);
+  });
+}
+
+function flipMemory(idx) {
+  if (memoryFlipped.length >= 2 || memoryFlipped.includes(idx)) return;
+  const cards = document.querySelectorAll('#memoryGrid .memory-card');
+  const card = cards[idx];
+  if (card.classList.contains('matched')) return;
+  
+  card.classList.add('flipped');
+  card.textContent = memoryCards[idx];
+  memoryFlipped.push(idx);
+  
+  if (memoryFlipped.length === 2) {
+    memoryMoves++;
+    document.getElementById('memoryMoves').textContent = memoryMoves;
+    
+    setTimeout(() => {
+      const [i1, i2] = memoryFlipped;
+      if (memoryCards[i1] === memoryCards[i2]) {
+        cards[i1].classList.add('matched');
+        cards[i2].classList.add('matched');
+        memoryMatched++;
+        document.getElementById('memoryPairs').textContent = `${memoryMatched}/8`;
+        if (memoryMatched === 8) {
+          clearInterval(memoryTimer);
+          setTimeout(() => alert(`🎉 Победа! Ходов: ${memoryMoves}, Время: ${document.getElementById('memoryTime').textContent}`), 300);
+        }
+      } else {
+        cards[i1].classList.remove('flipped');
+        cards[i2].classList.remove('flipped');
+        cards[i1].textContent = '❓';
+        cards[i2].textContent = '❓';
+      }
+      memoryFlipped = [];
+    }, 800);
+  }
+}
+
+// === ИГРА 3: УГАДАЙ СЛОВО ===
+const words = [
+  {word:'ИШИМ',hint:'Главная река города'},
+  {word:'КРЕПОСТЬ',hint:'Место основания Петропавловска в 1752 году'},
+  {word:'МУЗЕЙ',hint:'Место хранения истории города'},
+  {word:'ТЕАТР',hint:'Здесь показывают спектакли'},
+  {word:'СОБОР',hint:'Религиозное здание, в честь которого назван город'},
+  {word:'ПАРК',hint:'Место отдыха с аттракционами'},
+  {word:'БИБЛИОТЕКА',hint:'Место, где хранятся книги'}
+];
+let wordCurrent = null;
+let wordGuessed = [];
+let wordLives = 6;
+
+function startWord() {
+  wordCurrent = words[Math.floor(Math.random()*words.length)];
+  wordGuessed = Array(wordCurrent.word.length).fill('_');
+  wordLives = 6;
+  document.getElementById('wordHint').textContent = `💡 Подсказка: ${wordCurrent.hint}`;
+  document.getElementById('wordLives').textContent = '❤️'.repeat(wordLives);
+  document.getElementById('wordDisplay').textContent = wordGuessed.join(' ');
+  
+  const kb = document.getElementById('wordKeyboard');
+  kb.innerHTML = '';
+  'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'.split('').forEach(letter => {
+    const key = document.createElement('button');
+    key.className = 'word-key';
+    key.textContent = letter;
+    key.onclick = () => guessLetter(letter, key);
+    kb.appendChild(key);
+  });
+}
+
+function guessLetter(letter, keyEl) {
+  if (keyEl.classList.contains('used')) return;
+  keyEl.classList.add('used');
+  
+  if (wordCurrent.word.includes(letter)) {
+    wordCurrent.word.split('').forEach((l, i) => {
+      if (l === letter) wordGuessed[i] = letter;
+    });
+    document.getElementById('wordDisplay').textContent = wordGuessed.join(' ');
+    
+    if (!wordGuessed.includes('_')) {
+      setTimeout(() => {
+        alert('🎉 Победа! Слово угадано!');
+        startWord();
+      }, 300);
+    }
+  } else {
+    wordLives--;
+    document.getElementById('wordLives').textContent = '❤️'.repeat(Math.max(0,wordLives)) + '🖤'.repeat(6-wordLives);
+    if (wordLives === 0) {
+      setTimeout(() => {
+        alert(`😢 Игра окончена! Слово было: ${wordCurrent.word}`);
+        startWord();
+      }, 300);
+    }
+  }
+}
+
+// === ИГРА 4: ПЯТНАШКИ ===
+let puzzleTiles = [];
+let puzzleMoves = 0;
+
+function startPuzzle() {
+  puzzleTiles = [1,2,3,4,5,6,7,8,0];
+  for (let i=0; i<100; i++) {
+    const emptyIdx = puzzleTiles.indexOf(0);
+    const moves = [];
+    if (emptyIdx > 2) moves.push(emptyIdx-3);
+    if (emptyIdx < 6) moves.push(emptyIdx+3);
+    if (emptyIdx % 3 !== 0) moves.push(emptyIdx-1);
+    if (emptyIdx % 3 !== 2) moves.push(emptyIdx+1);
+    const move = moves[Math.floor(Math.random()*moves.length)];
+    [puzzleTiles[emptyIdx], puzzleTiles[move]] = [puzzleTiles[move], puzzleTiles[emptyIdx]];
+  }
+  puzzleMoves = 0;
+  document.getElementById('puzzleMoves').textContent = 'Ходов: 0';
+  renderPuzzle();
+}
+
+function renderPuzzle() {
+  const grid = document.getElementById('puzzleGrid');
+  grid.innerHTML = '';
+  puzzleTiles.forEach((num, idx) => {
+    const tile = document.createElement('div');
+    tile.className = 'puzzle-tile' + (num === 0 ? ' empty' : '');
+    tile.textContent = num || '';
+    tile.onclick = () => movePuzzle(idx);
+    grid.appendChild(tile);
+  });
+}
+
+function movePuzzle(idx) {
+  const emptyIdx = puzzleTiles.indexOf(0);
+  const canMove = (
+    (idx === emptyIdx-1 && emptyIdx%3 !== 0) ||
+    (idx === emptyIdx+1 && emptyIdx%3 !== 2) ||
+    idx === emptyIdx-3 ||
+    idx === emptyIdx+3
+  );
+  if (!canMove) return;
+  
+  [puzzleTiles[idx], puzzleTiles[emptyIdx]] = [puzzleTiles[emptyIdx], puzzleTiles[idx]];
+  puzzleMoves++;
+  document.getElementById('puzzleMoves').textContent = `Ходов: ${puzzleMoves}`;
+  renderPuzzle();
+  
+  if (puzzleTiles.slice(0,8).every((v,i) => v === i+1)) {
+    setTimeout(() => alert(`🎉 Победа! Решено за ${puzzleMoves} ходов!`), 300);
+  }
+}
+
+// === ИГРА 5: НАЙДИ ПАРУ ===
+const pairsEmojis = ['🏺','🎭','🎪','🏛️','🎨','🏔️','🐎','🌾'];
+let pairsCards = [];
+let pairsFlipped = [];
+let pairsMatched = 0;
+let pairsMoves = 0;
+
+function startPairs() {
+  pairsCards = [...pairsEmojis, ...pairsEmojis].sort(() => Math.random() - 0.5);
+  pairsFlipped = [];
+  pairsMatched = 0;
+  pairsMoves = 0;
+  document.getElementById('pairsMoves').textContent = '0';
+  document.getElementById('pairsPairs').textContent = '0/8';
+  
+  const grid = document.getElementById('pairsGrid');
+  grid.innerHTML = '';
+  pairsCards.forEach((emoji, idx) => {
+    const card = document.createElement('div');
+    card.className = 'pair-card';
+    card.dataset.idx = idx;
+    card.textContent = '❓';
+    card.onclick = () => flipPair(idx);
+    grid.appendChild(card);
+  });
+}
+
+function flipPair(idx) {
+  if (pairsFlipped.length >= 2 || pairsFlipped.includes(idx)) return;
+  const cards = document.querySelectorAll('#pairsGrid .pair-card');
+  const card = cards[idx];
+  if (card.classList.contains('matched')) return;
+  
+  card.classList.add('flipped');
+  card.textContent = pairsCards[idx];
+  pairsFlipped.push(idx);
+  
+  if (pairsFlipped.length === 2) {
+    pairsMoves++;
+    document.getElementById('pairsMoves').textContent = pairsMoves;
+    
+    setTimeout(() => {
+      const [i1, i2] = pairsFlipped;
+      if (pairsCards[i1] === pairsCards[i2]) {
+        cards[i1].classList.add('matched');
+        cards[i2].classList.add('matched');
+        pairsMatched++;
+        document.getElementById('pairsPairs').textContent = `${pairsMatched}/8`;
+        if (pairsMatched === 8) {
+          setTimeout(() => alert(`🎉 Все пары найдены за ${pairsMoves} ходов!`), 300);
+        }
+      } else {
+        cards[i1].classList.remove('flipped');
+        cards[i2].classList.remove('flipped');
+        cards[i1].textContent = '❓';
+        cards[i2].textContent = '❓';
+      }
+      pairsFlipped = [];
+    }, 800);
+  }
+}
+
+// Автостарт первой игры памяти при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+  startMemory();
+  startWord();
+  startPuzzle();
+  startPairs();
+});
+</script>
+
+</body>
+</html>
